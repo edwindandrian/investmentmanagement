@@ -1,7 +1,12 @@
 # Pantau Portofolio
 
-Pelacak portofolio investasi dengan halaman login. Catat transaksi beli/jual/dividen, pantau nilai pasar,
-untung/rugi, dan alokasi aset. Harga diisi manual lewat tombol **Perbarui harga**.
+Dasbor monitoring portofolio dengan halaman login, disusun mengikuti file Excel "Futures recap":
+
+- **Ringkasan**: total aset, sisa pinjaman, passive income bersih, aset kotor, aset bersih, dan aset realistis.
+- **Aset**: daftar aset per kategori (Franchise, Ternak, Mobil, Emas, Saham, Cash, dst.).
+- **Arus kas**: catatan operasional (Opex) dan investasi (Capex), dengan total per usaha.
+- **Kinerja outlet**: laba total dan laba riil per outlet per bulan (laba total × kepemilikan, separuh setelah BEP).
+- **Data → Impor dari Excel**: memuat sheet Asset, Cashflow, dan Perfomance Real langsung di browser.
 
 ## Cara kerja login
 
@@ -12,7 +17,8 @@ untung/rugi, dan alokasi aset. Harga diisi manual lewat tombol **Perbarui harga*
   lalu menetapkan cookie `HttpOnly; Secure; SameSite=Lax` yang ditandatangani HMAC dan berlaku 7 hari.
 - Akun demo `dummy` / `dummy` aktif bawaan. Matikan dengan variabel `DEMO_LOGIN=off` di Vercel.
 - `api/logout.js` menghapus cookie. Tombol **Keluar** ada di dashboard.
-- Data portofolio tetap disimpan di `localStorage` browser (belum di server).
+- Data portofolio disimpan di `localStorage` browser (belum di server). Gunakan **Data → Ekspor cadangan** secara berkala.
+- File Excel tidak pernah dikirim ke server dan tidak disimpan di repo (`*.xlsx` ada di `.gitignore`).
 
 ## Pengaturan (sekali saja)
 
