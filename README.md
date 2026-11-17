@@ -10,6 +10,7 @@ untung/rugi, dan alokasi aset. Harga diisi manual lewat tombol **Perbarui harga*
   hanya mengirimkannya jika cookie sesi valid. Tanpa sesi, pengunjung dialihkan ke `/login`.
 - `api/login.js` memeriksa nama pengguna dan kata sandi (hash scrypt, perbandingan waktu-konstan),
   lalu menetapkan cookie `HttpOnly; Secure; SameSite=Lax` yang ditandatangani HMAC dan berlaku 7 hari.
+- Akun demo `dummy` / `dummy` aktif bawaan. Matikan dengan variabel `DEMO_LOGIN=off` di Vercel.
 - `api/logout.js` menghapus cookie. Tombol **Keluar** ada di dashboard.
 - Data portofolio tetap disimpan di `localStorage` browser (belum di server).
 

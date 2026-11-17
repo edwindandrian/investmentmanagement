@@ -15,18 +15,22 @@ module.exports = async (req, res) => {
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ error: 'Metode tidak diizinkan.' });
   }
-  const { AUTH_USERNAME, AUTH_PASSWORD_HASH, SESSION_SECRET } = process.env;
-  if (!AUTH_USERNAME || !AUTH_PASSWORD_HASH || !SESSION_SECRET) {
+  const { AUTH_USERNAME, AUTH_PASSWORD_HASH, SESSION_SECRET, DEMO_LOGIN } = process.env;
+  // Akun demo (dummy/dummy) aktif secara bawaan. Matikan dengan DEMO_LOGIN=off di Vercel.
+  const demoOn = String(DEMO_LOGIN || '').toLowerCase() !== 'off';
+  const adminOn = !!(AUTH_USERNAME && AUTH_PASSWORD_HASH);
+  if (!SESSION_SECRET || (!adminOn && !demoOn)) {
     return res.status(500).json({ error: 'Server belum dikonfigurasi. Atur AUTH_USERNAME, AUTH_PASSWORD_HASH, dan SESSION_SECRET di Vercel.' });
   }
   const { username = '', password = '' } = readBody(req);
   if (typeof username !== 'string' || typeof password !== 'string' || username.length > 200 || password.length > 500) {
     return res.status(400).json({ error: 'Data tidak valid.' });
   }
-  // Selalu jalankan kedua pemeriksaan agar waktu respons tidak membocorkan nama pengguna.
-  const userOk = safeEqual(username, AUTH_USERNAME);
+  // Selalu jalankan semua pemeriksaan agar waktu respons tidak membocorkan nama pengguna.
+  const demoOk = safeEqual(username, 'dummy') & safeEqual(password, 'dummy') & demoOn;
+  const userOk = safeEqual(username, AUTH_USERNAME || '\u0000');
   const passOk = await verifyPassword(password, AUTH_PASSWORD_HASH);
-  if (!(userOk && passOk)) {
+  if (!(demoOk || (adminOn && userOk && passOk))) {
     await sleep(700);
     return res.status(401).json({ error: 'Nama pengguna atau kata sandi salah.' });
   }
