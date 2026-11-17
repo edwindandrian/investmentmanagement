@@ -1,6 +1,11 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "outputDirectory": "public",
   "cleanUrls": true,
+  "rewrites": [{ "source": "/", "destination": "/api/app" }],
+  "functions": {
+    "api/app.js": { "includeFiles": "private/**" }
+  },
   "headers": [
     {
       "source": "/(.*)",

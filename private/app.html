@@ -153,6 +153,7 @@ dialog h2{font-size:17px}
       <button class="btn" id="btnPrices" type="button">Perbarui harga</button>
       <button class="btn" id="btnCsv" type="button" hidden>Ekspor CSV</button>
       <button class="btn primary" id="btnAdd" type="button">Tambah transaksi</button>
+      <button class="btn" id="btnLogout" type="button">Keluar</button>
     </div>
   </header>
 
@@ -644,6 +645,7 @@ $('#prForm').addEventListener('submit',e=>{
 
 /* ---------- Events ---------- */
 $('#btnAdd').onclick=()=>openTx('beli');
+$('#btnLogout').onclick=async()=>{try{await fetch('/api/logout',{method:'POST'})}catch(e){}location.href='/login'};
 $('#btnPrices').onclick=openPrices;
 $('#btnClear').onclick=()=>{state=emptyState();persist();renderAll()};
 $('#btnMore').onclick=()=>{ui.showAll=!ui.showAll;renderTxs()};

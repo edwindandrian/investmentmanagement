@@ -1,31 +1,53 @@
 # Pantau Portofolio
 
-Pelacak portofolio investasi satu halaman (HTML + CSS + JavaScript, tanpa build).
-Catat transaksi beli/jual/dividen, pantau nilai pasar, untung/rugi, dan alokasi aset.
+Pelacak portofolio investasi dengan halaman login. Catat transaksi beli/jual/dividen, pantau nilai pasar,
+untung/rugi, dan alokasi aset. Harga diisi manual lewat tombol **Perbarui harga**.
 
-- Data disimpan di `localStorage` browser (tidak dikirim ke server mana pun).
-- Harga diisi manual lewat tombol **Perbarui harga**.
-- Ekspor riwayat transaksi ke CSV.
+## Cara kerja login
 
-## Jalankan lokal
+- `public/login.html` adalah satu-satunya halaman yang disajikan secara publik.
+- Dashboard ada di `private/app.html` dan **tidak pernah disajikan sebagai file statis**. Fungsi `api/app.js`
+  hanya mengirimkannya jika cookie sesi valid. Tanpa sesi, pengunjung dialihkan ke `/login`.
+- `api/login.js` memeriksa nama pengguna dan kata sandi (hash scrypt, perbandingan waktu-konstan),
+  lalu menetapkan cookie `HttpOnly; Secure; SameSite=Lax` yang ditandatangani HMAC dan berlaku 7 hari.
+- `api/logout.js` menghapus cookie. Tombol **Keluar** ada di dashboard.
+- Data portofolio tetap disimpan di `localStorage` browser (belum di server).
 
-```bash
-npx serve .
-```
+## Pengaturan (sekali saja)
 
-## Deploy ke Vercel (otomatis tiap push ke GitHub)
+1. Buat hash kata sandi dan rahasia sesi (kata sandi minimal 10 karakter):
 
-1. Push repo ini ke GitHub.
-2. Buka https://vercel.com/new, pilih **Import Git Repository**, lalu pilih repo ini.
-3. Framework Preset: **Other**. Kosongkan Build Command dan Output Directory.
-4. Klik **Deploy**. Setiap `git push` ke `main` memicu deploy produksi baru, dan setiap pull request mendapat preview URL.
+   ```bash
+   npm run hash -- "kata sandi Anda"
+   ```
 
-Domain sendiri: Project → Settings → Domains.
+2. Di Vercel: **Project → Settings → Environment Variables**, tambahkan tiga variabel
+   (untuk Production, Preview, dan Development):
 
-## Lewat CLI
+   | Nama | Nilai |
+   |---|---|
+   | `AUTH_USERNAME` | nama pengguna pilihan Anda |
+   | `AUTH_PASSWORD_HASH` | baris `AUTH_PASSWORD_HASH=...` dari langkah 1 (tanpa awalan `AUTH_PASSWORD_HASH=`) |
+   | `SESSION_SECRET` | baris `SESSION_SECRET=...` dari langkah 1 |
+
+3. **Redeploy** (Deployments → titik tiga → Redeploy) agar variabel terbaca.
+
+Mengganti `SESSION_SECRET` akan mengeluarkan semua sesi yang aktif.
+
+## Deploy
+
+Push ke `main`; Vercel otomatis menerbitkan versi baru. Framework Preset: **Other**, tanpa Build Command.
+
+## Lokal
 
 ```bash
 npm i -g vercel
-vercel        # preview
-vercel --prod # produksi
+cp .env.example .env.local   # isi nilainya
+vercel dev
 ```
+
+## Batasan
+
+- Satu akun (satu pasang nama pengguna dan kata sandi).
+- Tidak ada pembatasan percobaan login selain jeda 0,7 detik pada setiap kegagalan. Gunakan kata sandi yang panjang.
+- Karena data ada di `localStorage`, data tidak berpindah antar perangkat.
